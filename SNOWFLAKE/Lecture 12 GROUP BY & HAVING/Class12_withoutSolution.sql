@@ -60,5 +60,155 @@ VALUES
 (25, 'Electronics', 'Camera', '2025-02-04', '2025-02-12', 1, 650.00, 650.00);
 
 
--- STARTING WITH THE AGGREGATE FUNCTIONS
 
+SELECT * FROM SALES_TRANSACTIONS;
+
+-- QUERY-1
+/*
+     You are given the sales data of our company. Your job is analysis is to analyse the data and return us the analysis.
+     The first requirement is to, write a sql query to return us all the data that is just related to 'Furniture' and 'Appliances'
+     After returning that particular data we need to see the data where the transaction date is after '2025-01-15'.
+     Return the result in desc oredr of total sales amount and categories.
+     Note that we need all the columns in the result.
+*/ 
+SELECT  *    
+FROM SALES_TRANSACTIONS
+WHERE CATEGORY IN ('Furniture', 'Home Appliances') AND TRANSACTION_DATE > '2025-01-15'
+ORDER  BY TOTAL_SALE DESC, CATEGORY DESC;
+
+
+-- STARTING WITH THE AGGREGATE FUNCTIONS
+SELECT * FROM SALES_TRANSACTIONS;
+
+SELECT 
+      SUM(QUANTITY) AS TOTAL_QUANTITY_SOLD_TILL_DATE  -- SUM IS COULUMN WISE OPEARTION 
+FROM SALES_TRANSACTIONS;
+
+SELECT 
+      QUANTITY + UNIT_PRICE AS TOTAL_QUANTITY_AND_UNIT -- ROW WISE OPEARTION
+FROM SALES_TRANSACTIONS;
+
+-- COUNT()
+SELECT COUNT(CATEGORY) AS TOTAL_RECORDS
+FROM SALES_TRANSACTIONS
+WHERE CATEGORY = 'Furniture';
+
+-- MIN() - returning 1 value. it is not cleaning. it is comparing the whole column
+SELECT 
+      MIN(QUANTITY) AS MIN_QUANTITY_SOLD
+FROM SALES_TRANSACTIONS;
+
+-- MAX() - 
+SELECT 
+      MAX(QUANTITY) AS MAXIMUM_QTY_SOLD
+FROM SALES_TRANSACTIONS;
+
+-- AVG() - FIND THE MEAN=(AVG)
+SELECT
+      ROUND(AVG(TOTAL_SALE), 2) AS AVG_TOTAL_SALE_VALUE
+FROM SALES_TRANSACTIONS;     
+-- OR
+SELECT
+     ROUND(SUM(TOTAL_SALE) / COUNT(TRANSACTION_ID), 2) AS AVG_TOTAL_SALE_VALUE
+FROM SALES_TRANSACTIONS;
+
+-- GROUP BY
+SELECT * FROM SALES_TRANSACTIONS;
+
+SELECT CATEGORY,
+      SUM(QUANTITY) AS TOTAL_QTY_SOLD
+FROM SALES_TRANSACTIONS
+GROUP BY CATEGORY;
+
+-- UPDATING OUR TEMPLATE
+/*
+SELECT -- SELECTING THE COLUMNS / DATA TO DISPLAY
+FROM   -- SELECTING THE SOURCE OF DATA
+WHERE  -- FILTER OUR DATA
+GROUP BY -- AGGREGATE OUR DATA ACROSS GROUPS
+HAVING  -- CONDITION OUR GROUP BY AGGREGATIONS
+ORDER BY -- SORT OUR DATA 
+*/
+
+-- EXAMPLE
+SELECT
+    CATEGORY,
+    SUM(TOTAL_SALE)
+FROM SALES_TRANSACTIONS
+GROUP BY CATEGORY;
+
+-- ADVANCING THE AGGREGATE FUNCTION
+-- QUERY-1
+/*
+  You are given the sales data of our company. we have business across multiple categories. we want to see the sum of total sale value across category. Give us the category which has higest sale at the top and then at the least one at the bottom.
+*/ SELECT * FROM SALES_TRANSACTIONS;
+SELECT
+    CATEGORY,
+    SUM(TOTAL_SALE) AS TOTAL_SALE_VALUE      
+FROM SALES_TRANSACTIONS
+GROUP BY CATEGORY
+ORDER BY SUM(TOTAL_SALE) DESC;
+
+-- QUERY-2
+/* 
+   Find the total quantity of products sold in each subcategory where the total sale amount is greater than $500.
+   You need to return thr result in the order of ascending of quantity sold.
+*/
+SELECT * FROM SALES_TRANSACTIONS;
+
+SELECT
+    SUBCATEGORY,
+    SUM(QUANTITY) AS TOTAL_QTY_VALUE
+FROM SALES_TRANSACTIONS
+WHERE TOTAL_SALE > 500
+GROUP BY SUBCATEGORY
+ORDER BY  SUM(QUANTITY) ASC;
+
+-- QUERY - 3
+/*
+   Find the average sale price for each category, and display the results in descending order of the average sale price.
+ */ SELECT * FROM SALES_TRANSACTIONS;
+SELECT
+      CATEGORY,
+      AVG(TOTAL_SALE) AS AVG_TOTAL_SALE
+FROM SALES_TRANSACTIONS
+GROUP BY CATEGORY
+ORDER BY AVG(TOTAL_SALE) DESC;
+
+-- QUERY-4
+/*
+  Write a SQL query to retrieve the aggregations of the sum, count, avg of total sale 
+  across each categories and sub-categories as well.
+*/ SELECT * FROM SALES_TRANSACTIONS;
+SELECT
+    CATEGORY,
+    SUBCATEGORY,
+    SUM(TOTAL_SALE) AS SUM_TOTAL_SALE,    
+    ROUND(AVG(TOTAL_SALE), 2) AS AVG_TOTAL_SALE,
+    COUNT(TOTAL_SALE) AS COUNT_TOTAL_SALE
+FROM SALES_TRANSACTIONS
+GROUP BY CATEGORY, SUBCATEGORY;
+
+-- QUERY-5
+/*
+  From the SALE_TRANSACTIONS table. find the top 3 sub-categories under each main category where the total quantity sold is greater than 3. Dispaly the following details.
+  CATEGORY
+  SUBCATEGORY
+  Total Quantity sold (as Total_Quantity)
+  Total Sales Value (as TOTAL_SALE_AMOUNT)
+  Only consider transactions where the UNIT_price is graeter than 300. Sort the results by CATEGORY (ascending), 
+  TOTAL_SALE_AMOUNT (descending).
+  Your output must only contain top 3 records per category based on TOTAL_SALE_AMOUNT.  
+*/ SELECT * FROM SALES_TRANSACTIONS;
+
+SELECT
+    CATEGORY,
+    SUBCATEGORY,
+    SUM(QUANTITY) AS TOTAL_QTY_SALE,
+    SUM(TOTAL_SALE) AS TOTAL_SALE_AMOUNT
+FROM SALES_TRANSACTIONS
+WHERE UNIT_PRICE > 300
+GROUP BY CATEGORY, SUBCATEGORY
+HAVING SUM(QUANTITY) > 3
+ORDER BY CATEGORY ASC, SUM(TOTAL_SALE) DESC
+LIMIT 3;
